@@ -1,43 +1,24 @@
 name: Deploy to GitHub Pages
 
-on:
-  push:
-    branches: [ main ]  # 确保这是您的实际分支名
+   on:
+     push:
+       branches: [ main ]  # 或者您的主分支名称
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4  # 升级到 v4 更安全
+   jobs:
+     build-and-deploy:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Checkout
+           uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'  # 启用 pnpm 缓存加速
+         - name: Install and Build
+           run: |
+             npm install -g pnpm
+             pnpm install
+             pnpm build
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Build Project
-        run: pnpm build
-
-      - name: Verify Output Directory  # 调试步骤
-        run: |
-          echo "Current directory:"
-          ls -la
-          echo "Checking dist directory:"
-          test -d dist && echo "dist exists" || { echo "dist NOT FOUND!"; exit 1; }
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist          # 必须与构建输出目录一致
-          branch: gh-pages      # 明确指定部署分支
-          token: ${{ secrets.GITHUB_TOKEN }}
-          clean: true           # 清理旧文件
-          single-commit: true   # 生成单一提交（推荐）
+         - name: Deploy
+           uses: JamesIves/github-pages-deploy-action@v4
+           with:
+             folder: dist
+             branch: gh-pages
